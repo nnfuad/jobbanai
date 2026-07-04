@@ -1,0 +1,102 @@
+import Link from "next/link";
+import { signup } from "@/app/(auth)/actions";
+import { Mail, Lock, User, ArrowRight } from "lucide-react";
+
+export default async function SignupPage(props: {
+  searchParams: Promise<{ message: string }>;
+}) {
+  const searchParams = await props.searchParams;
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 lg:pl-0">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex flex-col items-center gap-3 mb-6">
+            <div className="logo-mark-sm">
+              <span>J</span>
+            </div>
+            <span className="logo-text text-2xl">jobbanai</span>
+          </Link>
+          <h1 className="text-2xl font-extrabold tracking-tight heading-gradient mb-1">
+            Create an account
+          </h1>
+          <p className="text-[var(--muted)] text-sm">
+            Join the jobbanai community
+          </p>
+        </div>
+
+        <form className="flex flex-col gap-4" action={signup}>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" htmlFor="name">
+              Full name
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+              <input
+                className="w-full pl-10 pr-4 py-2.5 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent outline-none transition-all text-sm placeholder:text-[var(--muted)]"
+                name="name"
+                id="name"
+                placeholder="John Doe"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" htmlFor="email">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+              <input
+                className="w-full pl-10 pr-4 py-2.5 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent outline-none transition-all text-sm placeholder:text-[var(--muted)]"
+                name="email"
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+              <input
+                className="w-full pl-10 pr-4 py-2.5 bg-[var(--card)] border border-[var(--border)] rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent outline-none transition-all text-sm placeholder:text-[var(--muted)]"
+                type="password"
+                name="password"
+                id="password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </div>
+
+          {searchParams?.message && (
+            <p className="p-3 bg-rose-500/10 text-rose-500 text-center text-sm rounded-lg border border-rose-500/20">
+              {searchParams.message}
+            </p>
+          )}
+
+          <button className="w-full bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-mid)] hover:opacity-90 text-white font-medium py-2.5 rounded-lg transition-all mt-2 flex items-center justify-center gap-2 text-sm active:scale-[0.98] shadow-lg shadow-[var(--gradient-mid)]/20">
+            Create account
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </form>
+
+        <p className="text-center text-[var(--muted)] text-sm mt-6">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="heading-accent font-semibold hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
