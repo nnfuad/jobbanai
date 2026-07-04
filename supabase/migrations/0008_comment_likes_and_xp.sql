@@ -15,7 +15,12 @@ CREATE TABLE IF NOT EXISTS public.comment_likes (
 -- Enable RLS
 ALTER TABLE public.comment_likes ENABLE ROW LEVEL SECURITY;
 
--- Policies for comment_likes
+-- Safely recreate policies to avoid "already exists" errors
+DROP POLICY IF EXISTS "Anyone can view comment_likes" ON public.comment_likes;
+DROP POLICY IF EXISTS "Authenticated users can insert comment_likes" ON public.comment_likes;
+DROP POLICY IF EXISTS "Users can update their own comment_likes" ON public.comment_likes;
+DROP POLICY IF EXISTS "Users can delete their own comment_likes" ON public.comment_likes;
+
 CREATE POLICY "Anyone can view comment_likes" ON public.comment_likes FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can insert comment_likes" ON public.comment_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own comment_likes" ON public.comment_likes FOR UPDATE USING (auth.uid() = user_id);
