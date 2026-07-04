@@ -5,6 +5,7 @@ import { logout } from "@/app/(auth)/actions";
 import ResponsiveFeed from "@/components/ResponsiveFeed";
 import { Pitch } from "@/components/PitchCard";
 import ProfileHeader from "@/components/ProfileHeader";
+import ProfileDetails from "@/components/ProfileDetails";
 
 function formatTimeAgo(dateString: string) {
   const date = new Date(dateString);
@@ -44,7 +45,7 @@ export default async function ProfilePage() {
   // Fetch the user's profile data (XP, etc.)
   const { data: profileData } = await supabase
     .from("users")
-    .select("xp, username, avatar_url, cover_url, username_changes_count")
+    .select("xp, username, avatar_url, cover_url, username_changes_count, education, experience, technical_skills")
     .eq("id", user.id)
     .single();
   
@@ -60,6 +61,12 @@ export default async function ProfilePage() {
     avatar_url: profileData?.avatar_url || null,
     cover_url: profileData?.cover_url || null,
     username_changes_count: profileData?.username_changes_count || 0
+  };
+
+  const detailsUser = {
+    education: profileData?.education || [],
+    experience: profileData?.experience || [],
+    technical_skills: profileData?.technical_skills || []
   };
 
   // Fetch the user's pitches
@@ -133,6 +140,11 @@ export default async function ProfilePage() {
         </div>
 
         <div className="mt-8">
+          <ProfileDetails user={detailsUser} isOwner={true} />
+        </div>
+
+        <div className="mt-8">
+          <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 px-1">Pitches</h2>
           {pitches.length > 0 ? (
             <ResponsiveFeed pitches={pitches} isAuthenticated={true} />
           ) : (

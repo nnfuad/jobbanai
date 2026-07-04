@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import { createClient } from "@/utils/supabase/server";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "jobbanai",
@@ -19,12 +20,14 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
-        <Navigation user={user} />
-        <main className="flex-1 lg:pl-60 pb-16 lg:pb-0">
-          <div className="max-w-6xl mx-auto w-full">{children}</div>
-        </main>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Navigation user={user} />
+          <main className="flex-1 lg:pl-60 pb-16 lg:pb-0">
+            <div className="max-w-6xl mx-auto w-full">{children}</div>
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );

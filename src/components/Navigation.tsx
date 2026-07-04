@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Sparkles, PlusCircle, User, LogIn, LogOut } from "lucide-react";
 import { logout } from "@/app/(auth)/actions";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavigationProps {
   user: SupabaseUser | null;
@@ -63,18 +64,30 @@ export default function Navigation({ user }: NavigationProps) {
           })}
         </ul>
 
-        {user && (
-          <form action={logout}>
-            <button
-              type="submit"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-[15px] font-medium text-[var(--muted)] hover:bg-rose-500/10 hover:text-rose-500 w-full"
-            >
-              <LogOut className="w-5 h-5" strokeWidth={1.8} />
-              Sign out
-            </button>
-          </form>
-        )}
+        <div className="mt-auto flex flex-col gap-2 pt-4">
+          <div className="px-3 flex items-center justify-between">
+            <span className="text-[13px] font-medium text-[var(--muted)]">Theme</span>
+            <ThemeToggle />
+          </div>
+          
+          {user && (
+            <form action={logout}>
+              <button
+                type="submit"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-[15px] font-medium text-[var(--muted)] hover:bg-rose-500/10 hover:text-rose-500 w-full"
+              >
+                <LogOut className="w-5 h-5" strokeWidth={1.8} />
+                Sign out
+              </button>
+            </form>
+          )}
+        </div>
       </nav>
+
+      {/* Mobile Top Right Theme Toggle */}
+      <div className="lg:hidden fixed top-4 right-4 z-50 bg-[var(--background)]/80 backdrop-blur-md rounded-full p-2 border border-[var(--border)] shadow-sm">
+        <ThemeToggle />
+      </div>
 
       {/* Mobile Bottom Tab Bar */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-[var(--background)]/90 backdrop-blur-xl border-t border-[var(--border)] z-50">
