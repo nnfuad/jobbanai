@@ -15,6 +15,7 @@ interface ProfileHeaderProps {
     joinDate: string;
     avatar_url: string | null;
     cover_url: string | null;
+    bio: string | null;
     username_changes_count: number;
   };
 }
@@ -74,7 +75,13 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
           <p className="text-[var(--muted)] text-sm">@{user.username}</p>
         </div>
 
-        <div className="flex flex-wrap gap-4 mt-3 text-xs text-[var(--muted)]">
+        {user.bio && (
+          <div className="mt-3 text-sm text-[var(--foreground)] max-w-lg leading-relaxed">
+            {user.bio}
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-4 mt-4 text-xs text-[var(--muted)]">
           <div className="flex items-center gap-1">
             <Mail className="w-3.5 h-3.5" />
             {user.email}

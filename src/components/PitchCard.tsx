@@ -66,6 +66,9 @@ export default function PitchCard({ pitch, isAuthenticated, currentUserId }: Pit
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
 
+  // Image Preview state
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -396,11 +399,14 @@ export default function PitchCard({ pitch, isAuthenticated, currentUserId }: Pit
         </p>
 
         {pitch.image_url && (
-          <div className="mb-4 rounded-xl overflow-hidden border border-[var(--border)]">
+          <div 
+            className="mb-4 rounded-xl overflow-hidden border border-[var(--border)] cursor-pointer group"
+            onClick={() => setIsPreviewOpen(true)}
+          >
             <img 
               src={pitch.image_url} 
               alt="Pitch attachment" 
-              className="w-full object-cover max-h-[400px]"
+              className="w-full object-cover max-h-[400px] group-hover:opacity-90 transition-opacity"
             />
           </div>
         )}
@@ -580,6 +586,29 @@ export default function PitchCard({ pitch, isAuthenticated, currentUserId }: Pit
         onClose={() => setAuthModalOpen(false)}
         action={authAction}
       />
+
+      {/* Image Preview Modal */}
+      {isPreviewOpen && pitch.image_url && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={() => setIsPreviewOpen(false)}
+        >
+          <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center animate-fade-in" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setIsPreviewOpen(false)}
+              className="absolute -top-12 right-0 p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              aria-label="Close image preview"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img 
+              src={pitch.image_url} 
+              alt="Pitch attachment preview" 
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

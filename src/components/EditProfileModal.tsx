@@ -13,6 +13,7 @@ interface EditProfileModalProps {
     username: string;
     avatar_url: string | null;
     cover_url: string | null;
+    bio: string | null;
     username_changes_count: number;
   };
   onUpdateSuccess: () => void;
@@ -20,6 +21,7 @@ interface EditProfileModalProps {
 
 export default function EditProfileModal({ isOpen, onClose, user, onUpdateSuccess }: EditProfileModalProps) {
   const [username, setUsername] = useState(user.username);
+  const [bio, setBio] = useState(user.bio || "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState(user.avatar_url);
@@ -93,6 +95,7 @@ export default function EditProfileModal({ isOpen, onClose, user, onUpdateSucces
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username,
+          bio,
           avatar_url: finalAvatarUrl,
           cover_url: finalCoverUrl
         }),
@@ -217,6 +220,21 @@ export default function EditProfileModal({ isOpen, onClose, user, onUpdateSucces
                 You have reached the maximum number of username changes.
               </p>
             )}
+          </div>
+
+          {/* Bio */}
+          <div>
+            <label className="block text-sm font-medium text-[var(--muted)] mb-2">Bio</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              className="w-full px-4 py-2 bg-[var(--background)] border border-[var(--border)] rounded-lg focus:outline-none focus:border-[var(--accent)] text-sm resize-none h-24"
+              placeholder="Tell us a little bit about yourself..."
+              maxLength={160}
+            />
+            <div className="flex justify-end mt-1">
+              <span className="text-xs text-[var(--muted)]">{bio.length}/160</span>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">

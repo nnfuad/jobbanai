@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { username, avatar_url, cover_url } = await request.json();
+    const { username, avatar_url, cover_url, bio } = await request.json();
 
     if (!username) {
       return NextResponse.json({ error: "Username is required" }, { status: 400 });
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     const updates: any = {
       avatar_url,
       cover_url,
+      bio,
     };
 
     // Check if username has changed

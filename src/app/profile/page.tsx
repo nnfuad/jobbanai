@@ -45,7 +45,7 @@ export default async function ProfilePage() {
   // Fetch the user's profile data (XP, etc.)
   const { data: profileData } = await supabase
     .from("users")
-    .select("xp, username, avatar_url, cover_url, username_changes_count, education, experience, technical_skills")
+    .select("xp, username, avatar_url, cover_url, bio, username_changes_count, education, experience, technical_skills")
     .eq("id", user.id)
     .single();
   
@@ -60,6 +60,7 @@ export default async function ProfilePage() {
     joinDate: joinDate,
     avatar_url: profileData?.avatar_url || null,
     cover_url: profileData?.cover_url || null,
+    bio: profileData?.bio || null,
     username_changes_count: profileData?.username_changes_count || 0
   };
 
