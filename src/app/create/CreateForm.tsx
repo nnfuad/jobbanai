@@ -64,7 +64,8 @@ export default function CreateForm() {
           .upload(filePath, imageFile);
 
         if (uploadError) {
-          throw new Error("Failed to upload image");
+          console.error("Supabase upload error:", uploadError);
+          throw new Error(`Failed to upload image: ${uploadError.message}`);
         }
 
         const { data: { publicUrl } } = supabase.storage
