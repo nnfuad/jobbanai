@@ -41,10 +41,27 @@ export async function signup(formData: FormData) {
     redirect(`/signup?message=${encodeURIComponent(error.message)}`)
   }
 
+  // Redirect to verify page with email
+  redirect(`/signup/verify?email=${encodeURIComponent(data.email)}`)
+}
+
+export async function verifyOtp(formData: FormData) {
+  const supabase = await createClient()
+  const email = formData.get('email') as string;
+  const otp = formData.get('otp') as string;
+
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token: otp,
+    type: 'signup',
+  });
+
+  if (error) {
+    redirect(`/signup/verify?email=${encodeURIComponent(email)}&message=${encodeURIComponent(error.message)}`)
+  }
+
   revalidatePath('/', 'layout')
-  // We redirect to a simple route parameter or just the home page.
-  // Supabase sends a confirmation link automatically if enabled.
-  redirect('/?message=Please check your email to confirm your account')
+  redirect('/')
 }
 
 export async function logout() {
