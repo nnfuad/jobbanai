@@ -80,6 +80,7 @@ export default async function ProfilePage() {
       likes,
       comments,
       created_at,
+      author_id,
       author:users(name),
       pitch_likes(user_id, vote_type)
     `)
@@ -110,6 +111,7 @@ export default async function ProfilePage() {
         timeAgo: p.created_at ? formatTimeAgo(p.created_at) : "just now",
         userVoteStatus,
         author: {
+          id: p.author_id,
           name: authorName,
           username: authorName.toLowerCase().replace(/[^a-z0-9]/g, ''),
           avatar: "", 
@@ -146,7 +148,11 @@ export default async function ProfilePage() {
         <div className="mt-8">
           <h2 className="text-xl font-bold text-[var(--foreground)] mb-4 px-1">Pitches</h2>
           {pitches.length > 0 ? (
-            <ResponsiveFeed pitches={pitches} isAuthenticated={true} />
+            <ResponsiveFeed 
+              pitches={pitches} 
+              isAuthenticated={true} 
+              currentUserId={user.id}
+            />
           ) : (
             <div className="flex justify-center text-[var(--muted)] py-12">
               <p className="text-sm">No pitches yet. Start sharing!</p>

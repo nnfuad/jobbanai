@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { pitch_id, content } = await request.json();
+    const { pitch_id, content, parent_id } = await request.json();
 
     if (!pitch_id || !content) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -25,12 +25,14 @@ export async function POST(request: Request) {
         pitch_id,
         author_id: user.id,
         content,
+        parent_id: parent_id || null,
       })
       .select(`
         id,
         content,
         created_at,
-        author_id
+        author_id,
+        parent_id
       `)
       .single();
 
@@ -61,14 +63,17 @@ export async function POST(request: Request) {
 
     // Format the comment to match frontend interface
     const authorName = authorData?.name || "Unknown";
+    const authorUsername = authorData?.name?.toLowerCase().replace(/[^a-z0-9]/g, '') || "unknown";
     const formattedComment = {
       id: comment.id,
+      parent_id: comment.parent_id,
       content: comment.content,
       likes: 0,
       userVoteStatus: null,
       timeAgo: "just now", // The client can parse created_at if needed, but for the immediate response this is fine
       author: {
         name: authorName,
+        username: authorUsername,
         avatar: "",
       }
     };
@@ -101,6 +106,7 @@ export async function GET(request: Request) {
         content,
         created_at,
         author_id,
+        parent_id,
         likes,
         comment_likes(user_id, vote_type)
       `)
@@ -123,6 +129,7 @@ export async function GET(request: Request) {
 
     const formattedComments = comments.map(comment => {
       const authorName = usersMap.get(comment.author_id) || "Unknown";
+      const authorUsername = authorName.toLowerCase().replace(/[^a-z0-9]/g, '');
       
       // Simple time formatting logic
       const date = new Date(comment.created_at);
@@ -147,12 +154,14 @@ export async function GET(request: Request) {
 
       return {
         id: comment.id,
+        parent_id: comment.parent_id,
         content: comment.content,
         likes: comment.likes || 0,
         userVoteStatus,
         timeAgo,
         author: {
           name: authorName,
+          username: authorUsername,
           avatar: "",
         }
       };

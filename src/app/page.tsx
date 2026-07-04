@@ -38,6 +38,7 @@ export default async function Home() {
       likes,
       comments,
       created_at,
+      author_id,
       author:users(name),
       pitch_likes(user_id, vote_type)
     `)
@@ -69,6 +70,7 @@ export default async function Home() {
         timeAgo: p.created_at ? formatTimeAgo(p.created_at) : "just now",
         userVoteStatus,
         author: {
+          id: p.author_id,
           name: authorName,
           username: authorName.toLowerCase().replace(/[^a-z0-9]/g, ''),
           avatar: "", // Can be updated if avatar URL is added to users table
@@ -99,7 +101,11 @@ export default async function Home() {
         </div>
       </header>
 
-      <ResponsiveFeed pitches={pitches} isAuthenticated={isAuthenticated} />
+      <ResponsiveFeed 
+        pitches={pitches} 
+        isAuthenticated={isAuthenticated} 
+        currentUserId={user?.id}
+      />
     </div>
   );
 }
