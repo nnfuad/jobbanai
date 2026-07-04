@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         id,
         content,
         created_at,
-        author:users(name)
+        author_id
       `)
       .single();
 
@@ -38,6 +38,13 @@ export async function POST(request: Request) {
       console.error('Error inserting comment:', error);
       return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
     }
+
+    // Fetch author details
+    const { data: authorData } = await supabase
+      .from('users')
+      .select('name')
+      .eq('id', user.id)
+      .single();
 
     // Increment comments count on pitches table
     // Using a raw update could be tricky with concurrent requests if not atomic, but for simple apps doing a simple RPC or just ignoring the race condition is fine. Let's do an RPC or just let the client rely on the fetched count.
@@ -53,7 +60,7 @@ export async function POST(request: Request) {
     }
 
     // Format the comment to match frontend interface
-    const authorName = Array.isArray(comment.author) ? comment.author[0]?.name : comment.author?.name || "Unknown";
+    const authorName = authorData?.name || "Unknown";
     const formattedComment = {
       id: comment.id,
       content: comment.content,
@@ -87,7 +94,7 @@ export async function GET(request: Request) {
         id,
         content,
         created_at,
-        author:users(name)
+        author_id
       `)
       .eq('pitch_id', pitch_id)
       .order('created_at', { ascending: true });
@@ -97,8 +104,17 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
     }
 
+    // Fetch user details for these comments
+    const authorIds = [...new Set((comments || []).map(c => c.author_id))];
+    const { data: usersData } = await supabase
+      .from('users')
+      .select('id, name')
+      .in('id', authorIds);
+
+    const usersMap = new Map(usersData?.map(u => [u.id, u.name]) || []);
+
     const formattedComments = comments.map(comment => {
-      const authorName = Array.isArray(comment.author) ? comment.author[0]?.name : comment.author?.name || "Unknown";
+      const authorName = usersMap.get(comment.author_id) || "Unknown";
       
       // Simple time formatting logic
       const date = new Date(comment.created_at);

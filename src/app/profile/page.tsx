@@ -92,7 +92,7 @@ export default async function ProfilePage() {
     pitches = pitchesData.map((p: any) => {
       const authorName = Array.isArray(p.author) ? p.author[0]?.name : p.author?.name || "Unknown";
       
-      let userVoteStatus = null;
+      let userVoteStatus: "up" | "down" | null = null;
       if (p.pitch_likes) {
         const userLike = p.pitch_likes.find((l: any) => l.user_id === user.id);
         if (userLike) {
