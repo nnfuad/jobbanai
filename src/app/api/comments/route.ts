@@ -64,6 +64,8 @@ export async function POST(request: Request) {
     const formattedComment = {
       id: comment.id,
       content: comment.content,
+      likes: 0,
+      userVoteStatus: null,
       timeAgo: "just now", // The client can parse created_at if needed, but for the immediate response this is fine
       author: {
         name: authorName,
@@ -81,6 +83,10 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     const { searchParams } = new URL(request.url);
     const pitch_id = searchParams.get('pitch_id');
 
@@ -94,7 +100,9 @@ export async function GET(request: Request) {
         id,
         content,
         created_at,
-        author_id
+        author_id,
+        likes,
+        comment_likes(user_id, vote_type)
       `)
       .eq('pitch_id', pitch_id)
       .order('created_at', { ascending: true });
@@ -129,9 +137,19 @@ export async function GET(request: Request) {
       else if (seconds > 60) timeAgo = Math.floor(seconds / 60) + "m";
       else if (seconds > 10) timeAgo = Math.floor(seconds) + "s";
 
+      let userVoteStatus = null;
+      if (user && comment.comment_likes) {
+        const userLike = comment.comment_likes.find((l: any) => l.user_id === user.id);
+        if (userLike) {
+          userVoteStatus = userLike.vote_type === 1 ? "up" : "down";
+        }
+      }
+
       return {
         id: comment.id,
         content: comment.content,
+        likes: comment.likes || 0,
+        userVoteStatus,
         timeAgo,
         author: {
           name: authorName,

@@ -28,6 +28,8 @@ interface Comment {
     avatar: string;
   };
   content: string;
+  likes: number;
+  userVoteStatus: "up" | "down" | null;
   timeAgo: string;
 }
 
@@ -126,6 +128,70 @@ export default function PitchCard({ pitch, isAuthenticated }: PitchCardProps) {
         setScore(prev => prev - 1);
         submitVote(-1);
       }
+    });
+  };
+
+  const submitCommentVote = async (commentId: string, vote_type: number) => {
+    try {
+      await fetch('/api/comments/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment_id: commentId, vote_type })
+      });
+    } catch (e) {
+      console.error("Failed to submit comment vote", e);
+    }
+  };
+
+  const handleCommentUpvote = (commentId: string) => {
+    requireAuth("upvote comment", () => {
+      setCommentsList(prev => prev.map(c => {
+        if (c.id !== commentId) return c;
+        let newStatus = c.userVoteStatus;
+        let newLikes = c.likes;
+        
+        if (c.userVoteStatus === "up") {
+          newStatus = null;
+          newLikes -= 1;
+          submitCommentVote(c.id, 0);
+        } else if (c.userVoteStatus === "down") {
+          newStatus = "up";
+          newLikes += 2;
+          submitCommentVote(c.id, 1);
+        } else {
+          newStatus = "up";
+          newLikes += 1;
+          submitCommentVote(c.id, 1);
+        }
+        
+        return { ...c, userVoteStatus: newStatus, likes: newLikes };
+      }));
+    });
+  };
+
+  const handleCommentDownvote = (commentId: string) => {
+    requireAuth("downvote comment", () => {
+      setCommentsList(prev => prev.map(c => {
+        if (c.id !== commentId) return c;
+        let newStatus = c.userVoteStatus;
+        let newLikes = c.likes;
+        
+        if (c.userVoteStatus === "down") {
+          newStatus = null;
+          newLikes += 1;
+          submitCommentVote(c.id, 0);
+        } else if (c.userVoteStatus === "up") {
+          newStatus = "down";
+          newLikes -= 2;
+          submitCommentVote(c.id, -1);
+        } else {
+          newStatus = "down";
+          newLikes -= 1;
+          submitCommentVote(c.id, -1);
+        }
+        
+        return { ...c, userVoteStatus: newStatus, likes: newLikes };
+      }));
     });
   };
 
@@ -316,12 +382,31 @@ export default function PitchCard({ pitch, isAuthenticated }: PitchCardProps) {
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 bg-[var(--border)]/30 rounded-2xl rounded-tl-none p-3 text-[14px]">
-                      <div className="flex items-baseline gap-2 mb-1">
-                        <span className="font-semibold">{comment.author.name}</span>
-                        <span className="text-[11px] text-[var(--muted)]">{comment.timeAgo}</span>
+                    <div className="flex-1">
+                      <div className="bg-[var(--border)]/30 rounded-2xl rounded-tl-none p-3 text-[14px]">
+                        <div className="flex items-baseline gap-2 mb-1">
+                          <span className="font-semibold">{comment.author.name}</span>
+                          <span className="text-[11px] text-[var(--muted)]">{comment.timeAgo}</span>
+                        </div>
+                        <p className="text-[var(--foreground)]">{comment.content}</p>
                       </div>
-                      <p className="text-[var(--foreground)]">{comment.content}</p>
+                      <div className="flex items-center gap-2 mt-1 ml-2">
+                        <button 
+                          onClick={() => handleCommentUpvote(comment.id)}
+                          className={`flex items-center gap-1 text-[11px] font-semibold transition-colors ${comment.userVoteStatus === "up" ? "text-[#FF4500]" : "text-[var(--muted)] hover:text-[#FF4500]"}`}
+                        >
+                          <ArrowBigUp className="w-3.5 h-3.5" fill={comment.userVoteStatus === "up" ? "currentColor" : "none"} />
+                        </button>
+                        <span className={`text-[11px] font-bold ${comment.userVoteStatus === "up" ? "text-[#FF4500]" : comment.userVoteStatus === "down" ? "text-[#7193FF]" : "text-[var(--muted)]"}`}>
+                          {comment.likes}
+                        </span>
+                        <button 
+                          onClick={() => handleCommentDownvote(comment.id)}
+                          className={`flex items-center gap-1 text-[11px] font-semibold transition-colors ${comment.userVoteStatus === "down" ? "text-[#7193FF]" : "text-[var(--muted)] hover:text-[#7193FF]"}`}
+                        >
+                          <ArrowBigDown className="w-3.5 h-3.5" fill={comment.userVoteStatus === "down" ? "currentColor" : "none"} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
