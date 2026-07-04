@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Image as ImageIcon, Send, Sparkles, X, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function CreateForm() {
   const [content, setContent] = useState("");
@@ -162,7 +163,7 @@ export default function CreateForm() {
               className="mt-1 h-4 w-4 rounded border-gray-300 text-[var(--accent)] focus:ring-[var(--accent)]"
             />
             <label htmlFor="terms" className="text-sm text-[var(--muted)]">
-              I agree to the Terms and Conditions and confirm this post follows the platform guidelines.
+              I agree to the <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline">Terms and Conditions</Link> and confirm this post follows the platform guidelines.
             </label>
           </div>
 
