@@ -16,23 +16,23 @@ ON CONFLICT (id) DO NOTHING;
 -- (Objects table already has RLS enabled by Supabase setup, we just need policies)
 
 -- Public read access to pitch_images
-CREATE POLICY "Public Access"
+CREATE POLICY "Public Access pitch_images"
 ON storage.objects FOR SELECT
 USING ( bucket_id = 'pitch_images' );
 
 -- Authenticated insert access to pitch_images
-CREATE POLICY "Authenticated users can upload images"
+CREATE POLICY "Authenticated users can upload pitch_images"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK ( bucket_id = 'pitch_images' );
 
 -- Allow users to update/delete their own images
-CREATE POLICY "Users can update their own images"
+CREATE POLICY "Users can update their own pitch_images"
 ON storage.objects FOR UPDATE
 TO authenticated
 USING ( bucket_id = 'pitch_images' AND auth.uid() = owner );
 
-CREATE POLICY "Users can delete their own images"
+CREATE POLICY "Users can delete their own pitch_images"
 ON storage.objects FOR DELETE
 TO authenticated
 USING ( bucket_id = 'pitch_images' AND auth.uid() = owner );
